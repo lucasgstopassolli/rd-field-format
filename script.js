@@ -1,15 +1,33 @@
 (function() {
+  // ============================================================
+  // SELETORES E CONFIGURAÇÕES
+  // ============================================================
+  var SELETORES = {
+    // Aceita múltiplos seletores separados por vírgula.
+    // Ex: 'input[name="phone"], input[name="telefone"], #celular'
+    campoTelefone: 'input[name="phone"]',
+    formularioPai: 'form',
+    nomeCampoVisual: 'phone_visual',
+    atributoControle: 'data-rd-orig'
+  };
+  // ============================================================
+
   function setupRDPhone() {
-    var originals = document.querySelectorAll('input[name="phone"]:not([type="hidden"]):not([data-rd-orig="true"])');
+    var originals = document.querySelectorAll(SELETORES.campoTelefone);
 
     for (var i = 0; i < originals.length; i++) {
       (function(origInput) {
-        origInput.setAttribute('data-rd-orig', 'true');
+        // Ignora inputs ocultos ou que já receberam a máscara
+        if (origInput.type === 'hidden' || origInput.getAttribute(SELETORES.atributoControle) === 'true') {
+          return;
+        }
+
+        origInput.setAttribute(SELETORES.atributoControle, 'true');
 
         // 1. Cria o campo visual clonando classes e placeholder do original
         var visualInput = document.createElement('input');
         visualInput.type = 'tel';
-        visualInput.name = 'phone_visual';
+        visualInput.name = SELETORES.nomeCampoVisual;
         visualInput.className = origInput.className;
         visualInput.placeholder = origInput.placeholder || '(11) 99999-9999';
         visualInput.setAttribute('autocomplete', 'tel');
@@ -72,7 +90,7 @@
         visualInput.addEventListener('change', syncPhone);
         visualInput.addEventListener('blur', syncPhone);
 
-        var parentForm = origInput.closest('form');
+        var parentForm = origInput.closest(SELETORES.formularioPai);
         if (parentForm) {
           parentForm.addEventListener('submit', syncPhone, true);
         }
